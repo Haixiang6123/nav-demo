@@ -7,38 +7,62 @@ a {
     text-decoration: none;
 }
 
-kbd {
-    margin: 4px;
-    position: relative;
-    display: inline-block;
-    width: 3em;
-    height: 3em;
-    vertical-align: top;
-    text-transform: uppercase;
-    color: white;
-    background: black;
+body {
+    height: 100vh;
+    background: white url('./bg.jpg') no-repeat center center;
+    background-size: cover;
+}
+
+main {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+main .wrapper {
+    padding: 50px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
-    box-sizing: border-box;
 }
 
-kbd:hover > button {
-    display: inline;
+.key {
+    margin: 10px;
+    position: relative;
+    text-transform: uppercase;
+    width: 60px;
+    height: 50px;
+    background: linear-gradient(to bottom, #292929 0%,#111111 100%);
+    border: 1px solid #373737;
+    color: #c5c5c5;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px #1A1B1C, 0 0 0 2px #1F2020, 0 2px 0 1px #000;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    font-family: 'helvetica'
 }
 
-kbd > button {
+.key > img {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1em;
+    height: 1em;
+    cursor: pointer;
+}
+
+.key > button {
     display: none;
     position: absolute;
     right: 0;
     bottom: 0;
 }
 
-main {
-    text-align: center;
-}
-
-main div:nth-child(2) {
-    margin-left: 1em;
-}
-main div:nth-child(3) {
-    margin-left: 2em;
+.key:hover > button {
+    display: inline;
 }

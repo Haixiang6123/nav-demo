@@ -17,67 +17,144 @@
     <footer></footer>
 
     <script>
-        var keys = [
-            ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-            ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-            ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
-        ]
-        var hash = {
-            q: 'qq.com',
-            w: 'weibo.com',
-            r: 'renren.com',
-            t: 'taobao.com',
-            y: 'yahoo.com',
-            u: 'uc.com',
-            i: 'iqiyi.com',
-            o: 'opera.com',
-            p: undefined,
-            a: 'amazon.com',
-            s: 'sohu.com',
-            z: 'zhihu.com',
-            m: 'mcdonals.com'
-        }
+        // Init
+        let {
+            keys,
+            hash
+        } = init()
 
-        let hashInLocalStorage = JSON.parse(localStorage.getItem('hash') || 'null')
-        if (hashInLocalStorage) {
-            hash = hashInLocalStorage
-        }
+        // Generate keyboard
+        createKeyboard(keys, hash)
 
-        let rowIndex = 0
-        let keyboardEl = document.querySelector('#keyboard .wrapper')
-        while (rowIndex < keys.length) {
-            let div = document.createElement('div')
-            keyboardEl.appendChild(div)
+        // Listen keyboard events
+        listenToKeyEvents(hash)
 
-            let keyIndex = 0;
-            let rowKeys = keys[rowIndex]
-
-            while (keyIndex < rowKeys.length) {
-                let key = document.createElement('kbd')
-                key.textContent = rowKeys[keyIndex]
-                buttonEl = document.createElement('button')
-                buttonEl.textContent = 'Edit'
-                buttonEl.id = rowKeys[keyIndex]
-                buttonEl.onclick = function (xx) {
-                    let selectedKey = xx.target.id
-                    let link = prompt('Give me a link')
-                    hash[selectedKey] = link
-
-                    localStorage.setItem('hash', JSON.stringify(hash))
-                }
-                
-                key.appendChild(buttonEl)
-                div.appendChild(key)
-                keyIndex = keyIndex + 1
+        function init() {
+            // Init data
+            var keys = [
+                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '{', '}'],
+                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '\"'],
+                ['z', 'x', 'c', 'v', 'b', 'n', 'm', '<', '>', '?'],
+            ]
+            var hash = {
+                q: 'www.qq.com',
+                w: 'www.weibo.com',
+                e: 'www.ebay.com',
+                r: 'www.reg.uci.edu',
+                t: 'www.taobao.com',
+                y: 'www.youtube.com',
+                u: 'www.uber.com',
+                i: 'www.iqiyi.com',
+                o: 'www.opera.com',
+                p: 'www.piazza.com',
+                '{': undefined,
+                '}': undefined,
+                a: 'www.amazon.com',
+                d: undefined,
+                s: 'www.shixiseng.com',
+                f: 'www.facebook.com',
+                g: 'www.google.com',
+                h: 'www.hulu.com',
+                k: 'www.kunvet.com',
+                l: 'www.linkedin.com',
+                z: 'www.zhihu.com',
+                x: 'www.xiaomi.com',
+                c: 'canvas.eee.uci.edu',
+                v: 'www.v2ex.com',
+                b: 'www.baidu.com',
+                n: 'www.nvidia.com',
+                m: 'www.microsoft.com',
             }
-            rowIndex = rowIndex + 1
+
+            let hashInLocalStorage = getHashData('hash')
+            if (hashInLocalStorage) {
+                hash = hashInLocalStorage
+            }
+
+            return {
+                keys,
+                hash
+            }
         }
 
-        document.onkeypress = function(xx) {
-            let key = xx['key']
-            let website = hash[key]
-            // location.href = 'http://' + website
-            window.open('http://' + website, '_blank')
+        function createKeyboard(keys, hash) {
+            let keyboardEl = document.querySelector('#keyboard .wrapper')
+            for (let rowIndex = 0; rowIndex < keys.length; rowIndex++) {
+                let div = tag('div')
+                addChildren(keyboardEl, [div])
+
+                let rowKeys = keys[rowIndex]
+                for (let keyIndex = 0; keyIndex < rowKeys.length; keyIndex++) {
+                    // kbd
+                    let kbdEl = tag('kbd', {
+                        className: 'key'
+                    })
+
+                    // text
+                    let span = tag('span', {
+                        textContent: rowKeys[keyIndex],
+                        className: 'text'
+                    })
+
+                    // img
+                    imgEl = tag('img', {
+                        id: rowKeys[keyIndex],
+                        src: (hash[rowKeys[keyIndex]]) ? 'http://' + hash[rowKeys[keyIndex]] + '/favicon.ico' :
+                            './plus.png',
+                        onclick: function (event) {
+                            editHandler(event, hash)
+                        },
+                        onerror: function (event) {
+                            event.target.src = './warn.png'
+                        }
+                    })
+
+                    // add children
+                    addChildren(kbdEl, [span, imgEl])
+                    addChildren(div, [kbdEl])
+                }
+            }
+        }
+
+        function listenToKeyEvents(hash) {
+            document.onkeypress = function (event) {
+                let key = event['key']
+                let website = hash[key]
+                if (website) {
+                    window.open('http://' + website, '_blank')
+                }
+                else {
+                    alert('No website binds to this key!')
+                }
+            }
+        }
+
+        function editHandler(event, hash) {
+            let selectedKey = event.target.id
+            let domain = prompt('Give me a link', hash[selectedKey])
+
+            hash[selectedKey] = domain
+            event.target.src = 'http://' + domain + '/favicon.ico'
+
+            localStorage.setItem('hash', JSON.stringify(hash))
+        }
+
+        function getHashData(name) {
+            return JSON.parse(localStorage.getItem(name) || 'null')
+        }
+
+        function tag(tagName, attributes) {
+            let ele = document.createElement(tagName);
+            for (let key in attributes) {
+                ele[key] = attributes[key]
+            }
+            return ele
+        }
+
+        function addChildren(parentEl, children) {
+            for (let child of children) {
+                parentEl.appendChild(child)
+            }
         }
     </script>
 </body>
